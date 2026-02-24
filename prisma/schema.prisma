@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  RoleName @unique
+  users User[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role_id   Int
+  role      Role     @relation(fields: [role_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  createdTickets  Ticket[] @relation("CreatedTickets")
+  assignedTickets Ticket[] @relation("AssignedTickets")
+  comments        TicketComment[]
+  statusLogs      TicketStatusLog[]
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  status      TicketStatus @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  created_by  Int
+  assigned_to Int?
+
+  createdBy   User @relation("CreatedTickets", fields: [created_by], references: [id])
+  assignedTo  User? @relation("AssignedTickets", fields: [assigned_to], references: [id])
+
+  comments    TicketComment[]
+  statusLogs  TicketStatusLog[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model TicketComment {
+  id        Int      @id @default(autoincrement())
+  comment   String
+  ticket_id Int
+  user_id   Int
+
+  ticket    Ticket @relation(fields: [ticket_id], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+}
+
+model TicketStatusLog {
+  id         Int      @id @default(autoincrement())
+  ticket_id  Int
+  old_status TicketStatus
+  new_status TicketStatus
+  changed_by Int
+
+  ticket     Ticket @relation(fields: [ticket_id], references: [id], onDelete: Cascade)
+  user       User   @relation(fields: [changed_by], references: [id])
+
+  changed_at DateTime @default(now())
+}
+
+enum RoleName {
+  MANAGER
+  SUPPORT
+  USER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}

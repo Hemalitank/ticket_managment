@@ -1,0 +1,2 @@
+﻿src/users/users.service.ts(37,17): error TS2561: Object literal may only specify known properties, but 'roleId' does not exist in type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'. Did you mean to write 'role_id'?
+src/users/users.service.ts(54,17): error TS2561: Object literal may only specify known properties, but 'createdAt' does not exist in type 'UserSelect<DefaultArgs>'. Did you mean to write 'created_at'?
